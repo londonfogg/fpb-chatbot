@@ -66,6 +66,16 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('Anthropic API error:', err);
     // TEMP: exposing err.message for live debugging, remove once deploy is confirmed working
-    res.status(502).json({ error: 'Chat service temporarily unavailable', debug: err.message });
+    res.status(502).json({
+      error: 'Chat service temporarily unavailable',
+      debug: {
+        name: err.name,
+        message: err.message,
+        cause: err.cause ? String(err.cause) : undefined,
+        status: err.status,
+        keyPresent: !!process.env.ANTHROPIC_API_KEY,
+        keyLength: process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.length : 0,
+      },
+    });
   }
 };
