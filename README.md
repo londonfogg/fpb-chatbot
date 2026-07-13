@@ -8,29 +8,26 @@ Claude-API-powered FAQ chatbot for FutureProofBootcamp.com. Backend function + e
 - `widget/chatbot-widget.js` — the embeddable chat bubble, drop into Squarespace.
 - `package.json` — one dependency, the Anthropic SDK.
 
-## Next steps to get it live (in order)
+## Status: deployed and live (2026-07-13)
 
-1. **Get an Anthropic API key** — console.anthropic.com → API Keys.
-2. **Deploy the backend** — easiest is Vercel (free tier). This Mac doesn't have Node.js installed, so
-   skip the CLI and use the no-install path:
-   - Push this `fpb_chatbot` folder to a GitHub repo.
-   - vercel.com → New Project → import that repo → deploy (defaults are fine, it auto-detects the
-     `api/` function).
-   - In the Vercel project's Settings → Environment Variables, add `ANTHROPIC_API_KEY` with your key,
-     then redeploy.
-   - Note the deployed URL, e.g. `https://fpb-chatbot.vercel.app` — the function will be at
-     `https://fpb-chatbot.vercel.app/api/chat`.
-   - (Alternative: install Node.js + `npm install -g vercel`, then run `vercel` from this folder — but
-     the GitHub route needs no local setup.)
-3. **Point the widget at it** — before the widget script tag in Squarespace, add:
-   ```html
-   <script>window.FPB_CHAT_API_URL = "https://fpb-chatbot.vercel.app/api/chat";</script>
-   <script src="[hosted copy of chatbot-widget.js]"></script>
-   ```
-   The widget file itself also needs to be hosted somewhere public (Vercel can serve it as a static
-   file too, or drop it in the same deployment).
-4. **Add to Squarespace** — Settings → Advanced → Code Injection → Footer, paste the two script tags above.
-5. **Test on the live site** — bubble bottom-right, click to open, ask a real question.
+- Backend: https://fpb-chatbot.vercel.app/api/chat (Vercel project `future-proof-bootcamp/fpb-chatbot`)
+- Widget: https://fpb-chatbot.vercel.app/widget/chatbot-widget.js (served as a static file, publicly reachable)
+- GitHub: https://github.com/londonfogg/fpb-chatbot (main branch, Vercel auto-deploys on push)
+- `ANTHROPIC_API_KEY` is set in Vercel's Production environment variables.
+
+**Last step — add to Squarespace** (not yet done as of 2026-07-13):
+Settings → Advanced → Code Injection → Footer, paste:
+```html
+<script>window.FPB_CHAT_API_URL = "https://fpb-chatbot.vercel.app/api/chat";</script>
+<script src="https://fpb-chatbot.vercel.app/widget/chatbot-widget.js"></script>
+```
+Then test on the live site — bubble bottom-right, click to open, ask a real question.
+
+## Local dev / making changes later
+- Node is installed via `nvm` on this Mac (wasn't there originally — `export NVM_DIR="$HOME/.nvm"; source "$NVM_DIR/nvm.sh"` before any `node`/`npm` command in a fresh terminal).
+- `gh` (GitHub CLI) is installed at `~/bin/gh`, logged in as `londonfogg`, and `gh auth setup-git` is configured — `git push` from this folder works without asking for a token again.
+- Vercel CLI is installed globally (`vercel`), logged in, and the folder is linked to the `future-proof-bootcamp/fpb-chatbot` project. To ship a change: edit code → `git add`/`commit`/`push` (Vercel auto-deploys on push to `main`), or run `vercel --prod` directly.
+- To test locally first: `npm start` (runs `server.js`, a small local harness that mimics Vercel's `res.status()/.json()` helpers) and open `http://localhost:3000`.
 
 ## Open items before this is truly done
 - `faq.md` has two `[NEEDS ANSWER]` gaps: program format (in-person/remote/hybrid) and start date —
