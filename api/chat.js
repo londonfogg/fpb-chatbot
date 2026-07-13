@@ -65,6 +65,7 @@ module.exports = async (req, res) => {
     res.status(200).json({ reply });
   } catch (err) {
     console.error('Anthropic API error:', err);
-    res.status(502).json({ error: 'Chat service temporarily unavailable' });
+    // TEMP: exposing err.message for live debugging, remove once deploy is confirmed working
+    res.status(502).json({ error: 'Chat service temporarily unavailable', debug: err.message });
   }
 };
