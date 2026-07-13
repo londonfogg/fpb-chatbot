@@ -13,6 +13,28 @@
       transition: transform 0.15s ease;
     }
     #fpb-chat-bubble:hover { transform: scale(1.06); }
+    #fpb-chat-badge {
+      position: fixed; bottom: 34px; right: 92px; z-index: 999998;
+      background: #1a1a2e; color: #fff; border-radius: 999px;
+      padding: 9px 14px; font-size: 12.5px; font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22); white-space: nowrap;
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      opacity: 0; transform: translateY(6px) scale(0.96);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+    #fpb-chat-badge.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    #fpb-chat-badge::after {
+      content: ''; position: absolute; right: -6px; bottom: 14px;
+      width: 10px; height: 10px; background: #1a1a2e;
+      transform: rotate(45deg); border-radius: 2px; z-index: -1;
+    }
+    #fpb-chat-badge .fpb-badge-close {
+      background: none; border: none; color: #fff; opacity: 0.6;
+      font-size: 14px; line-height: 1; cursor: pointer; padding: 0;
+    }
+    #fpb-chat-badge .fpb-badge-close:hover { opacity: 1; }
     #fpb-chat-panel {
       position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: 90vw;
       height: 460px; max-height: 70vh; background: #fff; border-radius: 14px;
@@ -59,6 +81,44 @@
   bubble.textContent = '💬';
   document.body.appendChild(bubble);
 
+  var badgeDismissed = false;
+  try {
+    badgeDismissed = sessionStorage.getItem('fpbChatBadgeDismissed') === '1';
+  } catch (e) {}
+
+  var badge = document.createElement('div');
+  badge.id = 'fpb-chat-badge';
+  badge.innerHTML = `
+    <span>100% AI-Created Chatbot</span>
+    <button class="fpb-badge-close" aria-label="Dismiss">×</button>
+  `;
+  document.body.appendChild(badge);
+
+  function hideBadge(remember) {
+    badge.classList.remove('show');
+    if (remember) {
+      badgeDismissed = true;
+      try {
+        sessionStorage.setItem('fpbChatBadgeDismissed', '1');
+      } catch (e) {}
+    }
+  }
+
+  if (!badgeDismissed) {
+    setTimeout(function () {
+      if (!badgeDismissed) badge.classList.add('show');
+    }, 1200);
+  }
+
+  badge.addEventListener('click', function (e) {
+    if (e.target.classList.contains('fpb-badge-close')) {
+      hideBadge(true);
+      return;
+    }
+    hideBadge(true);
+    openPanel();
+  });
+
   var panel = document.createElement('div');
   panel.id = 'fpb-chat-panel';
   panel.innerHTML = `
@@ -97,6 +157,7 @@
   }
 
   bubble.addEventListener('click', function () {
+    hideBadge(true);
     panel.classList.contains('open') ? panel.classList.remove('open') : openPanel();
   });
   panel.querySelector('#fpb-chat-close').addEventListener('click', function () {
